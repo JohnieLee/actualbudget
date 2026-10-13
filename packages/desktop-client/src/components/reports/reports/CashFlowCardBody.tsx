@@ -15,12 +15,20 @@ import { LoadingIndicator } from '#components/reports/LoadingIndicator';
 import type { SimpleCashFlowData } from '#components/reports/spreadsheets/cash-flow-spreadsheet';
 
 import { CashFlowBarLabel } from './CashFlowBarLabel';
+import { ReportCardEmptyMessage } from './ReportCardEmptyMessage';
+
+// A bar label is two lines: the name, then the amount
+const LABEL_HEIGHT = 32;
 
 type CashFlowCardBodyProps = {
   title: ReactNode;
   start: string;
   end: string;
   data: SimpleCashFlowData | null;
+  // Shown in place of the bars, e.g. when there is nothing to chart
+  emptyMessage?: string;
+  // Keeps the bar labels inside a small card, such as in the sidebar
+  compact?: boolean;
 };
 
 export function CashFlowCardBody({
@@ -28,6 +36,8 @@ export function CashFlowCardBody({
   start,
   end,
   data,
+  emptyMessage,
+  compact = false,
 }: CashFlowCardBodyProps) {
   const { t } = useTranslation();
   const animationProps = useRechartsAnimation();
@@ -60,7 +70,9 @@ export function CashFlowCardBody({
         )}
       </View>
 
-      {data ? (
+      {emptyMessage ? (
+        <ReportCardEmptyMessage>{emptyMessage}</ReportCardEmptyMessage>
+      ) : data ? (
         <Container style={{ height: 'auto', flex: 1 }}>
           {(width, height) => (
             <BarChart
@@ -87,7 +99,12 @@ export function CashFlowCardBody({
                 <LabelList
                   dataKey="income"
                   position="left"
-                  content={<CashFlowBarLabel name={t('Income')} />}
+                  content={
+                    <CashFlowBarLabel
+                      name={t('Income')}
+                      maxLabelY={compact ? height - LABEL_HEIGHT : undefined}
+                    />
+                  }
                 />
               </Bar>
 
@@ -100,7 +117,12 @@ export function CashFlowCardBody({
                 <LabelList
                   dataKey="expenses"
                   position="right"
-                  content={<CashFlowBarLabel name={t('Expenses')} />}
+                  content={
+                    <CashFlowBarLabel
+                      name={t('Expenses')}
+                      maxLabelY={compact ? height - LABEL_HEIGHT : undefined}
+                    />
+                  }
                 />
               </Bar>
             </BarChart>

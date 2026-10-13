@@ -15,6 +15,8 @@ import { LoadingIndicator } from '#components/reports/LoadingIndicator';
 import type { NetWorthData } from '#components/reports/spreadsheets/net-worth-spreadsheet';
 import { useFormat } from '#hooks/useFormat';
 
+import { ReportCardEmptyMessage } from './ReportCardEmptyMessage';
+
 type NetWorthCardBodyProps = {
   title: ReactNode;
   start: string;
@@ -23,6 +25,8 @@ type NetWorthCardBodyProps = {
   mode: NonNullable<NonNullable<NetWorthWidget['meta']>['mode']>;
   showTooltip: boolean;
   data: NetWorthData | null;
+  // Shown in place of the graph, e.g. when there is nothing to chart
+  emptyMessage?: string;
 };
 
 export function NetWorthCardBody({
@@ -33,6 +37,7 @@ export function NetWorthCardBody({
   mode,
   showTooltip,
   data,
+  emptyMessage,
 }: NetWorthCardBodyProps) {
   const format = useFormat();
 
@@ -73,7 +78,9 @@ export function NetWorthCardBody({
         )}
       </View>
 
-      {data ? (
+      {emptyMessage ? (
+        <ReportCardEmptyMessage>{emptyMessage}</ReportCardEmptyMessage>
+      ) : data ? (
         <NetWorthGraph
           graphData={data.graphData}
           accounts={data.accounts}
