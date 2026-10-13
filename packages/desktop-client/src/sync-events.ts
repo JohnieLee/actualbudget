@@ -17,6 +17,10 @@ import type { Notification } from './notifications/notificationsSlice';
 import { payeeQueries } from './payees';
 import { loadPrefs } from './prefs/prefsSlice';
 import type { AppStore } from './redux/store';
+import {
+  createSidebarSummaryRefresher,
+  touchesSidebarSummaryTables,
+} from './reports/sidebarSummaryRefresh';
 import { signOut } from './users/usersSlice';
 
 // Notifications for sync events that can fire during budget load
@@ -48,6 +52,8 @@ const syncNotifications: Partial<
 };
 
 export function listenForSyncEvent(store: AppStore, queryClient: QueryClient) {
+  const sidebarSummaryRefresher = createSidebarSummaryRefresher(queryClient);
+
   // TODO: Should this run on mobile too?
   const unlistenUnauthorized = listen('sync-event', async ({ type }) => {
     if (type === 'unauthorized') {
@@ -138,6 +144,10 @@ export function listenForSyncEvent(store: AppStore, queryClient: QueryClient) {
         void queryClient.invalidateQueries({
           queryKey: accountGroupQueries.lists(),
         });
+      }
+
+      if (touchesSidebarSummaryTables(tables)) {
+        sidebarSummaryRefresher.schedule();
       }
     } else if (event.type === 'error') {
       let notif: Notification | null = null;
@@ -438,5 +448,6 @@ export function listenForSyncEvent(store: AppStore, queryClient: QueryClient) {
   return () => {
     unlistenUnauthorized();
     unlistenSuccess();
+    sidebarSummaryRefresher.cancel();
   };
 }

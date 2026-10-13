@@ -71,7 +71,16 @@ export class Navigation {
     this.page = page;
   }
 
+  // The account list is one slide of the sidebar summary carousel
+  async showSidebarAccounts() {
+    await this.page
+      .getByRole('region', { name: 'Summary' })
+      .getByRole('tab', { name: 'Accounts' })
+      .click();
+  }
+
   async goToAccountPage(accountName: string) {
+    await this.showSidebarAccounts();
     await this.page
       .getByRole('link', { name: new RegExp(`^${accountName}`) })
       .click();
@@ -184,6 +193,7 @@ export class Navigation {
   }
 
   async rightClickAccount(accountName: string) {
+    await this.showSidebarAccounts();
     await this.page
       .getByRole('link', { name: new RegExp(`^${accountName}`) })
       .click({ button: 'right' });
