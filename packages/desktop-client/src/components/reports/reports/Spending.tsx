@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { useParams } from 'react-router';
+import { useParams, useSearchParams } from 'react-router';
 
 import { AlignedText } from '@actual-app/components/aligned-text';
 import { Block } from '@actual-app/components/block';
@@ -54,8 +54,18 @@ import { addNotification } from '#notifications/notificationsSlice';
 import { useDispatch } from '#redux';
 import { useUpdateDashboardWidgetMutation } from '#reports/mutations';
 
+type SpendingMode = NonNullable<NonNullable<SpendingWidget['meta']>['mode']>;
+
+function parseSpendingMode(value: string | null): SpendingMode | undefined {
+  if (value === 'single-month' || value === 'budget' || value === 'average') {
+    return value;
+  }
+  return undefined;
+}
+
 export function Spending() {
   const params = useParams();
+  const [searchParams] = useSearchParams();
   const { data: widget, isPending } = useDashboardWidget<SpendingWidget>({
     id: params.id,
     type: 'spending-card',
@@ -65,14 +75,23 @@ export function Spending() {
     return <LoadingIndicator />;
   }
 
-  return <SpendingInternal widget={widget} />;
+  return (
+    <SpendingInternal
+      widget={widget}
+      // Without a saved widget, `?mode=budget` opens the report in that mode
+      initialMode={
+        params.id ? undefined : parseSpendingMode(searchParams.get('mode'))
+      }
+    />
+  );
 }
 
 type SpendingInternalProps = {
   widget?: SpendingWidget;
+  initialMode?: SpendingMode;
 };
 
-function SpendingInternal({ widget }: SpendingInternalProps) {
+function SpendingInternal({ widget, initialMode }: SpendingInternalProps) {
   const locale = useLocale();
   const dispatch = useDispatch();
   const { t } = useTranslation();
@@ -96,10 +115,11 @@ function SpendingInternal({ widget }: SpendingInternalProps) {
   const emptyIntervals: { name: string; pretty: string }[] = [];
   const [allIntervals, setAllIntervals] = useState(emptyIntervals);
 
-  const initialReportMode = widget?.meta?.mode ?? 'single-month';
-  const [initialCompare, initialCompareTo] = calculateSpendingReportTimeRange(
-    widget?.meta ?? {},
-  );
+  const initialMeta: NonNullable<SpendingWidget['meta']> =
+    widget?.meta ?? (initialMode ? { mode: initialMode } : {});
+  const initialReportMode = initialMeta.mode ?? 'single-month';
+  const [initialCompare, initialCompareTo] =
+    calculateSpendingReportTimeRange(initialMeta);
   const [compare, setCompare] = useState(initialCompare);
   const [compareTo, setCompareTo] = useState(initialCompareTo);
   const [averageRange, setAverageRange] = useState(
