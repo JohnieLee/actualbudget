@@ -15,6 +15,8 @@ type CashFlowBarLabelProps = {
   y?: number;
   width?: number;
   height?: number;
+  // Lowest a label for a short bar may sit, so it stays inside a small chart
+  maxLabelY?: number;
 };
 
 export function CashFlowBarLabel({
@@ -25,12 +27,13 @@ export function CashFlowBarLabel({
   y = 0,
   width: barWidth = 0,
   height: barHeight = 0,
+  maxLabelY = Infinity,
 }: CashFlowBarLabelProps) {
   const format = useFormat();
 
   const valueLengthOffset = 20;
 
-  const yOffset = barHeight < 25 ? 105 : y;
+  const yOffset = barHeight < 25 ? Math.min(105, maxLabelY) : y;
 
   const labelXOffsets = {
     right: 6,

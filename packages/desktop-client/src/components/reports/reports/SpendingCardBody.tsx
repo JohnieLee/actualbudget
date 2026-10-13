@@ -29,6 +29,7 @@ type SpendingCardBodyProps = {
   compare: string;
   compareTo: string;
   data: SpendingEntity | null;
+  showTooltip?: boolean;
 };
 
 export function SpendingCardBody({
@@ -37,6 +38,7 @@ export function SpendingCardBody({
   compare,
   compareTo,
   data,
+  showTooltip = true,
 }: SpendingCardBodyProps) {
   const { t } = useTranslation();
   const format = useFormat();
@@ -110,6 +112,7 @@ export function SpendingCardBody({
         <SpendingGraph
           style={{ flex: 1 }}
           compact
+          showTooltip={showTooltip}
           data={data}
           mode={spendingReportMode}
           compare={compare}
