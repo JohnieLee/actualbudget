@@ -41,6 +41,8 @@ type IntervalRange = {
   firstDayOfWeekIdx: string;
 };
 
+export type NetWorthData = ReturnType<typeof recalculate>;
+
 export function createSpreadsheet(
   start: string,
   end: string,

@@ -149,6 +149,7 @@ type SpendingGraphProps = {
   style?: CSSProperties;
   data: SpendingEntity;
   compact?: boolean;
+  showTooltip?: boolean;
   mode: 'single-month' | 'budget' | 'average';
   compare: string;
   compareTo: string;
@@ -158,6 +159,7 @@ export function SpendingGraph({
   style,
   data,
   compact,
+  showTooltip = true,
   mode,
   compare,
   compareTo,
@@ -269,18 +271,20 @@ export function SpendingGraph({
                   tickSize={0}
                 />
               )}
-              <Tooltip
-                content={
-                  <CustomTooltip
-                    balanceTypeOp={balanceTypeOp}
-                    selection={selection}
-                    compare={compare}
-                    format={format}
-                  />
-                }
-                formatter={numberFormatterTooltip}
-                isAnimationActive={false}
-              />
+              {showTooltip && (
+                <Tooltip
+                  content={
+                    <CustomTooltip
+                      balanceTypeOp={balanceTypeOp}
+                      selection={selection}
+                      compare={compare}
+                      format={format}
+                    />
+                  }
+                  formatter={numberFormatterTooltip}
+                  isAnimationActive={false}
+                />
+              )}
               <defs>
                 <linearGradient
                   id={`fill${balanceTypeOp}`}

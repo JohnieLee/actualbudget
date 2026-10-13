@@ -15,6 +15,10 @@ import { indexCashFlow, runAll } from '#components/reports/util';
 import type { FormatType } from '#hooks/useFormat';
 import type { useSpreadsheet } from '#hooks/useSpreadsheet';
 
+export type SimpleCashFlowData = {
+  graphData: { income: number; expense: number };
+};
+
 export function simpleCashFlow(
   startMonth: string,
   endMonth: string,
@@ -26,7 +30,7 @@ export function simpleCashFlow(
 
   return async (
     spreadsheet: ReturnType<typeof useSpreadsheet>,
-    setData: (data: { graphData: { income: number; expense: number } }) => void,
+    setData: (data: SimpleCashFlowData) => void,
   ) => {
     const { filters } = await send('make-filters-from-conditions', {
       conditions: conditions.filter(cond => !cond.customName),
