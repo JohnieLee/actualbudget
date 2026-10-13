@@ -41,13 +41,7 @@ import { addNotification } from '#notifications/notificationsSlice';
 import { useDispatch } from '#redux';
 import { useUpdateDashboardWidgetMutation } from '#reports/mutations';
 
-// Month-shaped so the range means the whole current month (the query clamps
-// to today); day-shaped values here would slide by days instead.
-export const defaultTimeFrame = {
-  start: monthUtils.currentMonth(),
-  end: monthUtils.currentMonth(),
-  mode: 'sliding-window',
-} satisfies TimeFrame;
+import { defaultTimeFrame } from './cashFlowTimeFrame';
 
 export function CashFlow() {
   const params = useParams();
